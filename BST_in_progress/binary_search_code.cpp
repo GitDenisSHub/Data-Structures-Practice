@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+#include <stack>
 using namespace std;
 
 /*
@@ -259,10 +260,38 @@ public:
     }
     //============================
 
+    //Возможный вспомогательный метод для обхода
+    bool traversal(Node* currentNode){
+        if(currentNode->left == nullptr && currentNode->right == nullptr){
+            cout<<currentNode->data<<" ";
+            return true;
+        }
+
+        if(currentNode->left != nullptr){
+            traversal(currentNode->left);
+        }
+
+        cout<<currentNode->data<<" ";
+
+        if(currentNode->right != nullptr){
+            traversal(currentNode->right);
+        }
+        return true;
+    }
+
     //============================
     //Обходи дерева (inorder = l -> n -> r)
-    void inorder(){
-        while
+    bool inorder(){
+        if(root == nullptr) return 0;
+        //Нужен ли нам вообще этот стек?
+        stack<Node*> stk;
+        Node* currentNode = root;
+
+        traversal(currentNode->left);
+        cout<<currentNode->data<<" ";
+        traversal(currentNode->right);
+
+        return true;
     }
     //============================
 
@@ -282,16 +311,18 @@ int main(){
     srand(time(NULL));
     
     BinarySearchTree bst;
+    int value;
 
-
-    for (size_t i = 0; i < 5; i++)
+    for (size_t i = 0; i < 10; i++)
     {
-        bst.insert(rand()%10+1);
+        value = rand()%100+1;
+        cout<<value<<" ";
+        bst.insert(value);
+        
     }
-    
-    cout << bst.find(4) << endl;
+    cout<<endl;
   
-    
+    bst.inorder();
 
     return 0;
 }
