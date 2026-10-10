@@ -11,10 +11,13 @@ using namespace std;
 	• Delete +
 	• поиск минимального элемента +
 	• поиск максимального элемента +
-	• обход дерева(inorder = l -> n -> r)
+	• обход дерева(inorder = l -> n -> r) +
     - clear() +
     - destructor BST +
 Тренирует: бинарный поиск, рекурсивную работу с деревьями и поддержание свойства BST.
+
+- сделал обход дерева inorder рекурсивным образом
+- сделал обход дерева inorder при помощи стека
 
 
 */
@@ -260,37 +263,85 @@ public:
     }
     //============================
 
-    //Возможный вспомогательный метод для обхода
-    bool traversal(Node* currentNode){
-        if(currentNode->left == nullptr && currentNode->right == nullptr){
-            cout<<currentNode->data<<" ";
-            return true;
+    //============================
+    //Вспомогательный метод для обхода
+    void inorder_help(Node* currentnode){
+        if(currentnode->left != nullptr){
+            inorder_help(currentnode->left);
         }
+        cout<<currentnode->data<<" ";
 
-        if(currentNode->left != nullptr){
-            traversal(currentNode->left);
+        if(currentnode->right != nullptr){
+            inorder_help(currentnode->right);
         }
+    }
+    //============================
+    
+    //============================
+    //Обход дерева (inorder = l -> n -> r)
+    bool inorder(){
+        if(root == nullptr) return false;
 
-        cout<<currentNode->data<<" ";
-
-        if(currentNode->right != nullptr){
-            traversal(currentNode->right);
-        }
+        inorder_help(root);
         return true;
     }
+    //============================
 
     //============================
-    //Обходи дерева (inorder = l -> n -> r)
-    bool inorder(){
-        if(root == nullptr) return 0;
-        //Нужен ли нам вообще этот стек?
+    //Обход дерева (inorder = l -> n -> r) при помощи стека
+    bool inorder_stack(){
+        if(root == nullptr) return false;
         stack<Node*> stk;
+        //Будем иногда оттождествлять top и currentNode
         Node* currentNode = root;
 
-        traversal(currentNode->left);
-        cout<<currentNode->data<<" ";
-        traversal(currentNode->right);
+        stk.emplace(currentNode);
+        while(stk.size() != 0){
+            if(currentNode->left !=  nullptr){
+                stk.emplace(currentNode->left);
+                currentNode = currentNode->left;
+                continue;
+            }
 
+            cout<<currentNode->data<<" ";
+            
+            if(currentNode->right !=  nullptr){
+                stk.pop();
+                stk.emplace(currentNode->right);
+                currentNode = currentNode->right;
+                continue;
+            }
+            stk.pop();
+            if(stk.size() == 0){
+                //cout<<currentNode->data<<" ";
+                currentNode = nullptr;
+                return true;
+            }
+            else{
+                currentNode = stk.top();
+                cout<<currentNode->data<<" ";
+                stk.pop();
+            }
+            
+
+            while(stk.size() != -1){
+                if(currentNode->right != nullptr){
+                    stk.emplace(currentNode->right);
+                    currentNode = currentNode->right;
+                    break;
+                }
+                else{
+                    if(stk.size() != 0){
+                        currentNode = stk.top();
+                        cout<<currentNode->data<<" ";
+                        stk.pop();
+                        //if(stk.size() == 0) return true;
+                    }
+                    else return true;
+                    
+                }
+            }
+        }
         return true;
     }
     //============================
@@ -313,7 +364,7 @@ int main(){
     BinarySearchTree bst;
     int value;
 
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 15; i++)
     {
         value = rand()%100+1;
         cout<<value<<" ";
@@ -321,8 +372,16 @@ int main(){
         
     }
     cout<<endl;
+    // bst.insert(4);
+    // bst.insert(2);
+    // bst.insert(6);
+    // bst.insert(3);
+    
+  
   
     bst.inorder();
+    cout<<"\n==========Stack============="<<endl;
+    bst.inorder_stack();
 
     return 0;
 }

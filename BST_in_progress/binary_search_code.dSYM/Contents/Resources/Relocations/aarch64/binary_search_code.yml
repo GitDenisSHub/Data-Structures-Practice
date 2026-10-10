@@ -1,5 +1,5 @@
 ---
 triple:          'arm64-apple-darwin'
-binary-path:     "/Users/denis/Файлы/Учеба/Программирование/Data_Structures_Practice/BSЕ_in_progress/binary_search_code"
+binary-path:     "/Users/denis/Файлы/Учеба/Программирование/Data_Structures_Practice/BST_in_progress/binary_search_code"
 relocations:     []
 ...
