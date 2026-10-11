@@ -2,5 +2,6 @@ build
 .dSYM
 .DS_Store
 .json
+.vscode/
 .vscode
-../.vscode/
+.vscode/
