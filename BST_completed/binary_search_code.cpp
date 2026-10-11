@@ -29,6 +29,11 @@ public:
     BinarySearchTree(int data)
     : root(new Node(data)), count_of_nodes(1){}
 
+
+    //Не реализуем эти функции пока, но защитим от использования
+    BinarySearchTree(const BinarySearchTree& another) = delete;
+    BinarySearchTree& operator= (const BinarySearchTree& another) = delete;
+
     class Node{
     public:
         Node(int data)
