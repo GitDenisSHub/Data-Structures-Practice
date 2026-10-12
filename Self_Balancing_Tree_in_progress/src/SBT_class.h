@@ -19,20 +19,40 @@ public:
     class Node{
     public:
         Node(int data)
-        : data(data), left(nullptr), right(nullptr){}
+        : data(data), left(nullptr), right(nullptr), height(0){}
 
     private:
         int data;
         Node* left;
         Node* right;
+        int height;
         friend class Self_balanced_tree;
     };
+    //==================================================
+    //Метод возвращает высоту максимальной ветки
+    int max(int left, int right);
+    //Метод возвращает высоту дерева
+    int getHeightTree();
+    //Метод возвращает высоту узла
+    int getHeightNode(Node* currentNode);
+    //Метод подсчитывает высоту отдельного узла рекурсивно
+    int recalculateHeightNode(Node* currentNode);
+    //Метод возвращает значение баланса узла
+    int getBalanceParameter(Node* currentNode);
+    //==================================================
+    //Метод для обновления высоты текущего дерева
+    int updateHeightNode(Node* currentNode);
+    //Балансировка узла
+    Node* balance(Node* currentNode, int is_balance);
 
     //Вспомогательный метод для добавления
-    Node* insertNode(Node* node,int data);
+    Node* insertNode(Node* currentNode,int data);
     //Метод добавления элементоа + автобалансировка
     Node* insert(int data);
-
+    //Балансировка слева-направо
+    Node* right_Rotate(Node* currentNode);
+    //Балансировка справа-налево
+    Node* left_Rotate(Node* currentNode);
 
 
     //Деструктор нашего дерева
