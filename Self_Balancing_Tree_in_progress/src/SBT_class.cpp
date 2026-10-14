@@ -14,7 +14,7 @@ int Self_balanced_tree::getBalanceParameter(Node* currentNode){
 //==================================================
 
 //==================================================
-//Метод возвращает высоту максимальной ветки
+//Метод возвращает высоту максимальной из двух веток
 int Self_balanced_tree::max(int left, int right){
     if(left > right) return left;
     else return right;
@@ -22,7 +22,7 @@ int Self_balanced_tree::max(int left, int right){
 //==================================================
 
 //==================================================
-//Метод подсчитывает высоту отдельного узла рекурсивно
+//Метод пересчитывает высоту всех узлов дерева декурсивно
 int Self_balanced_tree::recalculateHeightNode(Node* currentNode){
     if(currentNode == nullptr) return -1;
 
@@ -45,7 +45,7 @@ int Self_balanced_tree::getHeightTree(){
 //==================================================
 
 //==================================================
-//Метод для обновления высоты текущего дерева
+//Метод для обновления высоты текущего узла
 int Self_balanced_tree::updateHeightNode(Node* currentNode){
     if(currentNode == nullptr) return -1;
     currentNode->height = 1 + (max(getHeightNode(currentNode->left),getHeightNode(currentNode->right)));
@@ -53,18 +53,13 @@ int Self_balanced_tree::updateHeightNode(Node* currentNode){
 }
 //==================================================
 
-
-//Мы сначала добавляем элемент через рекурсию и потом через рекурсию возвращаем значения назад
-//Сначала возвращаем элемент предыдущему с его высотой и снова возвращаем его предыдущему
-//Тот получает высоту следующего наследника и если левая сторона больше второй - мы сразу делаем баланс
-//Если H <= 1 - дерево не требует балансировки
 //==================================================
 //Вспомогательный метод для добавления + автобалансировка 
 Self_balanced_tree::Node* Self_balanced_tree::insertNode(Node* currentNode, int data)
 {
     //Наш метод не multi - если значение равно узлу - мы игнорируем такое значение
     //Добавляем новый узел + сразу выставляем ему нулевую высоту, так как это лист
-    if(currentNode == nullptr){ currentNode = new Node(data); currentNode->height = 0; return currentNode;}
+    if(currentNode == nullptr){ currentNode = new Node(data); currentNode->height = 0; count_of_nodes++; return currentNode;}
     //При возвращении от листов к корню: каждый раз обновляем высоту
     //продолжаем искать место для вставки
     if(data < currentNode->data){currentNode->left = insertNode(currentNode->left, data);}
@@ -83,31 +78,53 @@ Self_balanced_tree::Node* Self_balanced_tree::insertNode(Node* currentNode, int 
 //==================================================
 
 //==================================================
-//Балансировка слева-направо
-Self_balanced_tree::Node* Self_balanced_tree::right_Rotate(Node* currentNode){
+//Балансировка левого перегруза
+Self_balanced_tree::Node* Self_balanced_tree::left_Rotate(Node* currentNode){
 
+    Node* safeNode = currentNode;
+    currentNode = currentNode->left;
+    safeNode->left = currentNode->right;
+    currentNode->right = safeNode;
+    currentNode->height = recalculateHeightNode(currentNode);
+
+    return currentNode;
 }
 //==================================================
 
 //==================================================
-//Балансировка слева-направо
-Self_balanced_tree::Node* Self_balanced_tree::left_Rotate(Node* currentNode){
+//Балансировка правого перегруза
+Self_balanced_tree::Node* Self_balanced_tree::right_Rotate(Node* currentNode){
+    Node* safeNode = currentNode;
+    currentNode = currentNode->right;
+    safeNode->right = currentNode->left;
+    currentNode->left = safeNode;
+    currentNode->height = recalculateHeightNode(currentNode);
 
+    return currentNode;
 }
 //==================================================
 
 //==================================================
 //Балансировка узла
 Self_balanced_tree::Node* Self_balanced_tree::balance(Node* currentNode, int is_balance){
-    
-    while(is_balance > 1 && is_balance < -1){
-        if(currentNode->height > 1){
-            left_Rotate(currentNode);
+    //Сначала нужно понять в какую сторону мы поворачиваем
+    //Делаем балансировку левой части
+    if(is_balance > 1){
+        if(getBalanceParameter(currentNode->left) <= -1){
+            currentNode->left = right_Rotate(currentNode->left);
+            currentNode->height = recalculateHeightNode(currentNode);
         }
-        else right_Rotate(currentNode);
+        currentNode = left_Rotate(currentNode);
+        
     }
-    
-
+    if(is_balance < -1){
+        if(getBalanceParameter(currentNode->right) >= 1){
+            currentNode->right = left_Rotate(currentNode->right);
+            currentNode->height = recalculateHeightNode(currentNode);
+        }
+        currentNode = right_Rotate(currentNode);
+    }
+    return currentNode;
 }
 //==================================================
 
@@ -116,12 +133,62 @@ Self_balanced_tree::Node* Self_balanced_tree::balance(Node* currentNode, int is_
 Self_balanced_tree::Node* Self_balanced_tree::insert(int data)
 {
     root = insertNode(root, data);   
-    count_of_nodes++;
+    return root;
+}
+
+//==================================================
+//Поиск максимального элемента
+Self_balanced_tree::Node* Self_balanced_tree::max_Node(){
+    if(root == nullptr) return nullptr;
+    Node* currentNode = root;
+    while(currentNode->right != nullptr) currentNode = currentNode->right;
+
+    return currentNode;
+}
+//Поиск минимального элемента
+Self_balanced_tree::Node* Self_balanced_tree::min_Node(){
+    if(root == nullptr) return nullptr;
+    Node* currentNode = root;
+    while(currentNode->left != nullptr) currentNode = currentNode->left;
+
+    return currentNode;
+}
+//Поиск элемента в дереве
+Self_balanced_tree::Node* Self_balanced_tree::search(int data){
+    if(root == nullptr) return nullptr;
+    if(data == root->data) return root;
+
+    Node* currentNode = root;
+    while(currentNode != nullptr){
+        if(currentNode->data == data) return currentNode;
+        if(data > currentNode->data) currentNode = currentNode->right;
+        else if(data < currentNode->data) currentNode = currentNode->left;
+    }
     return nullptr;
 }
+//==================================================
+
+//==================================================
+//Обход дерева inorder (l - t - r)
+void Self_balanced_tree::inorder(){
+    if(root == nullptr) cout<<"Tree is empty!"<<endl;
+    else inorderNode(root);
+    
+}
+//==================================================
+
+//==================================================
+//Вспомогательный метод для обхода дерева
+void Self_balanced_tree::inorderNode(Node* currentNode){
+    if(currentNode == nullptr) return;
+
+    if(currentNode->left != nullptr) inorderNode(currentNode->left);
+    cout << currentNode->data << " ";
+    if(currentNode->right != nullptr) inorderNode(currentNode->right);
+}
+//==================================================
 
 //Деструктор нашего дерева
 Self_balanced_tree::~Self_balanced_tree(){
 
 }
-//==================================================

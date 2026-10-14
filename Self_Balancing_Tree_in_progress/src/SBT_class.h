@@ -29,30 +29,40 @@ public:
         friend class Self_balanced_tree;
     };
     //==================================================
-    //Метод возвращает высоту максимальной ветки
+    //Метод возвращает высоту максимальной из двух веток
     int max(int left, int right);
     //Метод возвращает высоту дерева
     int getHeightTree();
     //Метод возвращает высоту узла
     int getHeightNode(Node* currentNode);
-    //Метод подсчитывает высоту отдельного узла рекурсивно
+    //Метод пересчитывает высоту всех узлов дерева декурсивно
     int recalculateHeightNode(Node* currentNode);
     //Метод возвращает значение баланса узла
     int getBalanceParameter(Node* currentNode);
     //==================================================
-    //Метод для обновления высоты текущего дерева
+    //Метод для обновления высоты текущего узла
     int updateHeightNode(Node* currentNode);
     //Балансировка узла
     Node* balance(Node* currentNode, int is_balance);
-
     //Вспомогательный метод для добавления
     Node* insertNode(Node* currentNode,int data);
     //Метод добавления элементоа + автобалансировка
     Node* insert(int data);
-    //Балансировка слева-направо
-    Node* right_Rotate(Node* currentNode);
-    //Балансировка справа-налево
+    //Балансировка левого перегруза
     Node* left_Rotate(Node* currentNode);
+    //Балансировка правого перегруза
+    Node* right_Rotate(Node* currentNode);
+
+    //Поиск максимального элемента
+    Node* max_Node();
+    //Поиск минимального элемента
+    Node* min_Node();
+    //Поиск элемента в дереве
+    Node* search(int data);
+    //Обход дерева inorder (l - t - r)
+    void inorder();
+    //Вспомогательный метод для обхода дерева 
+    void inorderNode(Node* currentNode);
 
 
     //Деструктор нашего дерева
