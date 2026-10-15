@@ -14,13 +14,14 @@ public:
     //Конструктор с параметрами
     Self_balanced_tree(int data)
     : root(new Node(data)), count_of_nodes(1){}
+    //Деструктор нашего дерева
+    ~Self_balanced_tree();
 
     //Класс узлов
     class Node{
     public:
         Node(int data)
         : data(data), left(nullptr), right(nullptr), height(0){}
-
     private:
         int data;
         Node* left;
@@ -29,30 +30,9 @@ public:
         friend class Self_balanced_tree;
     };
     //==================================================
-    //Метод возвращает высоту максимальной из двух веток
-    int max(int left, int right);
+    
     //Метод возвращает высоту дерева
     int getHeightTree();
-    //Метод возвращает высоту узла
-    int getHeightNode(Node* currentNode);
-    //Метод пересчитывает высоту всех узлов дерева декурсивно
-    int recalculateHeightNode(Node* currentNode);
-    //Метод возвращает значение баланса узла
-    int getBalanceParameter(Node* currentNode);
-    //==================================================
-    //Метод для обновления высоты текущего узла
-    int updateHeightNode(Node* currentNode);
-    //Балансировка узла
-    Node* balance(Node* currentNode, int is_balance);
-    //Вспомогательный метод для добавления
-    Node* insertNode(Node* currentNode,int data);
-    //Метод добавления элементоа + автобалансировка
-    Node* insert(int data);
-    //Балансировка левого перегруза
-    Node* left_Rotate(Node* currentNode);
-    //Балансировка правого перегруза
-    Node* right_Rotate(Node* currentNode);
-
     //Поиск максимального элемента
     Node* max_Node();
     //Поиск минимального элемента
@@ -61,15 +41,42 @@ public:
     Node* search(int data);
     //Обход дерева inorder (l - t - r)
     void inorder();
-    //Вспомогательный метод для обхода дерева 
-    void inorderNode(Node* currentNode);
+    //Метод для удаления узла из дерева
+    Node* remove(int data);
+    //Метод добавления элементоа + автобалансировка
+    Node* insert(int data);
+    
+    //==================================================
 
-
-    //Деструктор нашего дерева
-    ~Self_balanced_tree();
+    
 private:
     Node* root;
     int count_of_nodes;
+
+    //Вспомогательный метод для поиска минимального значения правой ветки (и вытягивание его)
+    Node* minRightNode(Node*& currentNode);
+    //Вспомогательный метод для удаления узда из дерева
+    Node* removeNode(int data, Node* currentNode);
+    //Вспомогательный метод для обхода дерева 
+    void inorderNode(Node* currentNode);
+    //Балансировка левого перегруза
+    Node* left_Rotate(Node* currentNode);
+    //Балансировка правого перегруза
+    Node* right_Rotate(Node* currentNode);
+     //Метод для обновления высоты текущего узла
+    int updateHeightNode(Node* currentNode);
+    //Балансировка узла
+    Node* balance(Node* currentNode, int is_balance);
+    //Вспомогательный метод для добавления
+    Node* insertNode(Node* currentNode,int data);
+    //Метод возвращает высоту максимальной из двух веток
+    int max(int left, int right);
+    //Метод пересчитывает высоту всех узлов дерева декурсивно
+    int recalculateHeightNode(Node* currentNode);
+    //Метод возвращает значение баланса узла
+    int getBalanceParameter(Node* currentNode);
+    //Метод возвращает высоту узла
+    int getHeightNode(Node* currentNode);
 };
 
 

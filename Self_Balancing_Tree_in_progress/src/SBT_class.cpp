@@ -1,9 +1,4 @@
 #include "SBT_class.h"
-//Формула высоты H = H(r) - H(l)
-//Лист имеет высоту 0
-//Пустое поддерево (nullptr) имеет высоту −1.
-//Высота любого другого узла равна высоте его самого высокого поддерева плюс один.
-//h(v)=1+max(h(v_L),h(v_R))
 
 //==================================================
 //Метод возвращает значение баланса узла
@@ -135,6 +130,7 @@ Self_balanced_tree::Node* Self_balanced_tree::insert(int data)
     root = insertNode(root, data);   
     return root;
 }
+//==================================================
 
 //==================================================
 //Поиск максимального элемента
@@ -178,6 +174,105 @@ void Self_balanced_tree::inorder(){
 //==================================================
 
 //==================================================
+//Метод для удаления узла из дерева
+Self_balanced_tree::Node* Self_balanced_tree::remove(int data){ root = removeNode(data, root); return root;}
+
+//==================================================
+//Вспомогательный метод для удаления узла из дерева
+Self_balanced_tree::Node* Self_balanced_tree::removeNode(int data, Node* currentNode){
+    //Если элемент пуст - возвращаем nullptr
+    if(currentNode == nullptr) return nullptr;
+    //Если нету наследников - просто возвращаемся назад
+    if(currentNode->left == nullptr && currentNode->right == nullptr && currentNode->data != data) return currentNode;
+
+    if(currentNode->data == data){
+        if(currentNode->height == 0){delete currentNode; currentNode = nullptr; count_of_nodes--; return currentNode;}
+        //В них нечего пересчитывать, все остается так же
+        if(currentNode->left == nullptr){
+            Node* safeNode = currentNode;
+            currentNode = currentNode->right; 
+            delete safeNode;
+            safeNode = nullptr;
+            count_of_nodes--;
+        }
+        else if(currentNode->right == nullptr){
+            Node* safeNode = currentNode; 
+            currentNode = currentNode->left; 
+            delete safeNode;
+            safeNode = nullptr;
+            count_of_nodes--;
+        }
+        else{
+            //Если есть оба наследника
+            //Будем смещать в его сторону наименьший элемент из правых!
+            Node* safeNode = currentNode;
+            currentNode = minRightNode(currentNode->right);
+            currentNode->left = safeNode->left;
+            if(safeNode->right != currentNode) currentNode->right = safeNode->right;
+            delete safeNode;
+            safeNode = nullptr;
+        }
+        //return currentNode;
+    }
+    else if(data > currentNode->data){currentNode->right = removeNode(data, currentNode->right);}
+    else{ currentNode->left = removeNode(data, currentNode->left);}
+
+    //===========================
+
+    //Сначала мы пересчитываем высоту всего дерева(иначе не знаю как)
+    currentNode->height = recalculateHeightNode(currentNode);
+    //Если перекос - делаем баланс
+    int is_balance = getBalanceParameter(currentNode);
+    cout<<endl<<"Наш баланс - " << is_balance << endl;
+    if(is_balance > 1 || is_balance < -1){
+        cout<<"У нас перекос на дереве! Выравниваем!"<<endl;
+        currentNode = balance(currentNode, is_balance);
+    }
+    //Сначала мы пересчитываем высоту всего дерева(иначе не знаю как)
+    currentNode->height = recalculateHeightNode(currentNode);
+    is_balance = getBalanceParameter(currentNode);
+    cout << "Проверяем еще раз - " << is_balance << endl;
+
+
+    return currentNode;
+}
+//==================================================
+
+//==================================================
+//Вспомогательный метод для поиска минимального значения правой ветки (и вытягивание его)
+Self_balanced_tree::Node* Self_balanced_tree::minRightNode(Node*& currentNode){
+
+    if(currentNode->left == nullptr && currentNode->right == nullptr){
+        Node* safeNode = new Node(currentNode->data);
+        delete currentNode;
+        currentNode = nullptr;
+        return safeNode;
+    }
+
+    else if(currentNode->left == nullptr && currentNode->right != nullptr){
+        Node* safeNode = currentNode;
+        currentNode = currentNode->right;
+        return safeNode;
+    }
+    else{
+        Node* helpNode = currentNode;
+        Node* safeNode;
+        while(helpNode->left != nullptr){
+            safeNode = helpNode;
+            helpNode = helpNode->left;
+        }
+        
+        if(helpNode->right == nullptr) {safeNode->left = nullptr; return helpNode;}
+        else{
+            safeNode->left = helpNode->right;
+            helpNode->right = nullptr;
+            return helpNode;
+        }
+    }  
+}
+//==================================================
+
+//==================================================
 //Вспомогательный метод для обхода дерева
 void Self_balanced_tree::inorderNode(Node* currentNode){
     if(currentNode == nullptr) return;
@@ -188,7 +283,9 @@ void Self_balanced_tree::inorderNode(Node* currentNode){
 }
 //==================================================
 
+//==================================================
 //Деструктор нашего дерева
 Self_balanced_tree::~Self_balanced_tree(){
 
 }
+//==================================================
