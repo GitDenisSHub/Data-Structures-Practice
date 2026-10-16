@@ -174,8 +174,13 @@ void Self_balanced_tree::inorder(){
 //==================================================
 
 //==================================================
-//Метод для удаления узла из дерева
-Self_balanced_tree::Node* Self_balanced_tree::remove(int data){ root = removeNode(data, root); return root;}
+//Метод для удаления узла из дерева + выполнение балансировки
+Self_balanced_tree::Node* Self_balanced_tree::remove(int data){
+    root = removeNode(data, root); 
+    return root;
+}
+//==================================================
+
 
 //==================================================
 //Вспомогательный метод для удаления узла из дерева
@@ -209,18 +214,18 @@ Self_balanced_tree::Node* Self_balanced_tree::removeNode(int data, Node* current
             currentNode = minRightNode(currentNode->right);
             currentNode->left = safeNode->left;
             if(safeNode->right != currentNode) currentNode->right = safeNode->right;
+            //Обновляем высоту дерева на основе высот его потомков
+            currentNode->height = recalculateHeightNode(currentNode);
+            count_of_nodes--;
             delete safeNode;
             safeNode = nullptr;
         }
-        //return currentNode;
     }
     else if(data > currentNode->data){currentNode->right = removeNode(data, currentNode->right);}
     else{ currentNode->left = removeNode(data, currentNode->left);}
 
-    //===========================
-
     //Сначала мы пересчитываем высоту всего дерева(иначе не знаю как)
-    currentNode->height = recalculateHeightNode(currentNode);
+    currentNode->height = updateHeightNode(currentNode);
     //Если перекос - делаем баланс
     int is_balance = getBalanceParameter(currentNode);
     cout<<endl<<"Наш баланс - " << is_balance << endl;
@@ -229,10 +234,9 @@ Self_balanced_tree::Node* Self_balanced_tree::removeNode(int data, Node* current
         currentNode = balance(currentNode, is_balance);
     }
     //Сначала мы пересчитываем высоту всего дерева(иначе не знаю как)
-    currentNode->height = recalculateHeightNode(currentNode);
+    currentNode->height = updateHeightNode(currentNode);
     is_balance = getBalanceParameter(currentNode);
     cout << "Проверяем еще раз - " << is_balance << endl;
-
 
     return currentNode;
 }
@@ -255,6 +259,7 @@ Self_balanced_tree::Node* Self_balanced_tree::minRightNode(Node*& currentNode){
         return safeNode;
     }
     else{
+        //Вот тут нужно как-то проверить балансировку и изменение высот
         Node* helpNode = currentNode;
         Node* safeNode;
         while(helpNode->left != nullptr){
@@ -262,15 +267,50 @@ Self_balanced_tree::Node* Self_balanced_tree::minRightNode(Node*& currentNode){
             helpNode = helpNode->left;
         }
         
-        if(helpNode->right == nullptr) {safeNode->left = nullptr; return helpNode;}
+        if(helpNode->right == nullptr) {safeNode->left = nullptr; safeNode->height = 0 ; return helpNode;}
         else{
             safeNode->left = helpNode->right;
+            safeNode->height = updateHeightNode(safeNode);
             helpNode->right = nullptr;
             return helpNode;
         }
     }  
 }
 //==================================================
+
+//==================================================
+//Метод для удаления всего дерева
+bool Self_balanced_tree::clear(){
+    //Проверка6 вдруг вообще ничего делать не нужно
+    if(root == nullptr) return true;
+
+    root = clearNode(root);
+    //Проверка, если удаления не было - нет смысла удалять корень
+    if(is_empty()) return true;
+    else return false;
+}
+//Мод возвращает ответ на вопрос
+bool Self_balanced_tree::is_empty(){
+    if(count_of_nodes == 0) return true;
+    else return false;
+}
+//==================================================
+
+//==================================================
+//Вспомогательный метод для удаления всего дерева
+Self_balanced_tree::Node* Self_balanced_tree::clearNode(Node* currentNode){
+    if(currentNode == nullptr) return nullptr;
+    currentNode->left = clearNode(currentNode->left);
+    currentNode->right = clearNode(currentNode->right);
+
+    delete currentNode;
+    currentNode = nullptr;
+    count_of_nodes--;
+
+    return currentNode;
+}
+//==================================================
+
 
 //==================================================
 //Вспомогательный метод для обхода дерева
@@ -285,7 +325,5 @@ void Self_balanced_tree::inorderNode(Node* currentNode){
 
 //==================================================
 //Деструктор нашего дерева
-Self_balanced_tree::~Self_balanced_tree(){
-
-}
+Self_balanced_tree::~Self_balanced_tree(){ clear();}
 //==================================================

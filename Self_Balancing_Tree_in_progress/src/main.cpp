@@ -60,8 +60,8 @@ int main(){
 
     sbt.inorder();
     
-    sbt.remove(33);
-    cout<<"Произошло удаление 33!"<<endl;
+    sbt.remove(52);
+    cout<<"Произошло удаление 52!"<<endl;
     
     sbt.inorder();
 
